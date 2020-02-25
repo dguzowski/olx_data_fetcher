@@ -18,6 +18,8 @@ import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 
+import java.util.Collections;
+
 class HttpServerVerticleTest {
 
 private HttpServerVerticle serverVerticle;
@@ -253,6 +255,8 @@ private HttpServerVerticle serverVerticle;
     }
 
     public MockContext mockRouteConfigOperations(){
+      Mockito.when(routerMock.getRoutes())
+        .thenReturn(Collections.emptyList());
       Mockito.when(routerMock.get(Mockito.anyString()))
         .thenReturn(routeMock);
       Mockito.when(routeMock.handler(Mockito.any(Handler.class)))

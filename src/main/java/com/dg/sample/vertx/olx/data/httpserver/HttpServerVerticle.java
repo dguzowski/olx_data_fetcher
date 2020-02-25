@@ -6,6 +6,7 @@ import io.vertx.core.Promise;
 import io.vertx.core.eventbus.Message;
 import io.vertx.core.http.HttpServer;
 import io.vertx.core.json.JsonObject;
+import io.vertx.ext.web.Route;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.RoutingContext;
 import org.slf4j.Logger;
@@ -37,6 +38,11 @@ public class HttpServerVerticle extends AbstractVerticle {
       if (http.succeeded()) {
         startPromise.complete();
         LOGGER.info("HTTP server started on port {}", serverPort);
+        LOGGER.info("Active endpoints: \n{}", router.getRoutes()
+          .stream()
+          .map(Route::getPath)
+          .collect(StringBuilder::new, (StringBuilder b, String s) -> b.append(s+"\n"), (b1, b2) -> b1.append(b2))
+          .toString());
       } else {
         LOGGER.error("Cannot start server on port {}", serverPort);
         startPromise.fail(http.cause());
