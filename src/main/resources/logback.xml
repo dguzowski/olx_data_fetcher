@@ -8,7 +8,7 @@
 
   <logger name="io.netty" level="warn"/>
   <logger name="io.vertx" level="info"/>
-  <logger name="com.dg.sample.vertx.olx.data" level="info"/>
+  <logger name="com.dg.sample.vertx.olx.data" level="debug"/>
 
   <root level="debug">
     <appender-ref ref="STDOUT"/>

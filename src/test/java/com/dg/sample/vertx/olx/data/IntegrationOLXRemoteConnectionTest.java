@@ -1,6 +1,7 @@
 package com.dg.sample.vertx.olx.data;
 
-import io.vertx.core.DeploymentOptions;
+import com.dg.sample.vertx.olx.data.httpserver.HttpServerVerticle;
+import com.dg.sample.vertx.olx.data.webclient.OlxWebClientVerticle;
 import io.vertx.core.Vertx;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.json.JsonArray;
@@ -10,35 +11,36 @@ import io.vertx.ext.web.client.WebClient;
 import io.vertx.junit5.VertxExtension;
 import io.vertx.junit5.VertxTestContext;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Properties;
+import java.util.concurrent.TimeUnit;
+
 
 @ExtendWith(VertxExtension.class)
-public class TestMainVerticle {
+public class IntegrationOLXRemoteConnectionTest {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(TestMainVerticle.class);
-  private static Properties props = new Properties();
-
-  @BeforeAll
-  static void initProperties() throws IOException {
-    InputStream resource = TestMainVerticle.class.getResourceAsStream("/app.properties");
-    props.load(resource);
-  }
+  private static final Logger LOGGER = LoggerFactory.getLogger(IntegrationOLXRemoteConnectionTest.class);
 
   @BeforeEach
   void deploy_verticle(Vertx vertx, VertxTestContext testContext) {
-    JsonObject config = JsonObject.mapFrom(props);
-    vertx.deployVerticle(new HttpServerVerticle(), new DeploymentOptions().setConfig(config),testContext.succeeding(id -> testContext.completeNow()));
+    vertx.deployVerticle(new MainVerticle(new HttpServerVerticle(), OlxWebClientVerticle.getInstance(vertx)), id -> testContext.completeNow());
   }
 
+
+  //enable to interact with running server
+  @Disabled
+  @Test
+  void runServer(Vertx vertx, VertxTestContext testContext) throws InterruptedException {
+    testContext.awaitCompletion(1, TimeUnit.DAYS);
+  }
+
+
+  @Disabled
   @Test
   void run(Vertx vertx, VertxTestContext testContext) {
     //given
@@ -53,6 +55,7 @@ public class TestMainVerticle {
       JsonObject data = res.result().bodyAsJsonObject();
       JsonArray offers = data.getJsonArray("offers");
       Assertions.assertTrue(offers.getList().size() > 0 );
+      LOGGER.info("\n{}", data.encodePrettily());
       testContext.completeNow();
     });
   }
